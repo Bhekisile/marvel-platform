@@ -6,6 +6,7 @@ import authReducer from './slices/authSlice';
 import chatReducer from './slices/chatSlice';
 import historyReducer from './slices/historySlice';
 import onboardingReducer from './slices/onboardingSlice';
+import toolSessionsReducer from './slices/toolSessionsSlice';
 import userReducer from './slices/userSlice';
 
 import { reducers as toolsReducers } from '@/tools/data';
@@ -19,6 +20,7 @@ const store = configureStore({
     chat: chatReducer,
     onboarding: onboardingReducer,
     history: historyReducer,
+    toolSessions: toolSessionsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

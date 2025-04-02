@@ -12,19 +12,22 @@ import GradientOutlinedButton from '@/components/GradientOutlinedButton';
 import PrimaryDatePickerInput from '@/components/PrimaryDatePickerInput';
 import PrimaryFileUpload from '@/components/PrimaryFileUpload';
 import PrimarySelectorInput from '@/components/PrimarySelectorInput';
-import PrimaryTextFieldInput from '@/components/PrimaryTextFieldInput';
 import PrimaryTextAreaInput from '@/components/PrimaryTextAreaInput';
+import PrimaryTextFieldInput from '@/components/PrimaryTextFieldInput';
 
 import styles from './styles';
 
 import ALERT_COLORS from '@/libs/constants/notification';
 import { AuthContext } from '@/libs/providers/GlobalProvider';
+import { setToolSessions } from '@/libs/redux/slices/toolSessionsSlice';
+// import { setToolSessionsSlice } from '@/libs/redux/slices/toolSessionsSlice';
 import { firestore } from '@/libs/redux/store';
 
 import { fetchToolHistory, actions as toolActions } from '@/tools/data';
 import { INPUT_TYPES } from '@/tools/libs/constants/inputs';
-import submitPrompt from '@/tools/libs/services/submitPrompt';
+// import submitPrompt from '@/tools/libs/services/submitPrompt';
 import evaluateCondition from '@/tools/libs/utils/evaluateCondition';
+import submitPrompt from '@/tools/libs/services/submitPrompt';
 
 const { setCommunicatorLoading, setFormOpen, setResponse } = toolActions;
 
@@ -53,7 +56,7 @@ const ToolRequestForm = (props) => {
     try {
       // eslint-disable-next-line no-console
       console.log('Form submission started with values:', values);
-      dispatch(setResponse(null));
+      dispatch(setToolSessions(null));
       dispatch(setCommunicatorLoading(true));
 
       // Handle file uploads first using original values
@@ -152,17 +155,19 @@ const ToolRequestForm = (props) => {
         toolData: { toolId: id, inputs: finalData },
       });
 
-      const response = await submitPrompt(
-        {
-          tool_data: { tool_id: id, inputs: finalData },
-          type: 'tool',
-          user: {
-            id: userData?.id,
-            fullName: userData?.fullName,
-            email: userData?.email,
+      const response = dispatch(
+        submitPrompt(
+          {
+            tool_data: { tool_id: id, inputs: finalData },
+            type: 'tool',
+            user: {
+              id: userData?.id,
+              fullName: userData?.fullName,
+              email: userData?.email,
+            },
           },
-        },
-        dispatch
+          dispatch
+        )
       );
 
       dispatch(setResponse(response));

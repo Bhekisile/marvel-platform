@@ -1,0 +1,4 @@
+export const styles = {
+  '@import':
+    'url(https://fonts.googleapis.com/css2?family=Satoshi:wght@400;500;700&display=swap)',
+};

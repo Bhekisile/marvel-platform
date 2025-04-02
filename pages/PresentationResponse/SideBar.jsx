@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import NavItem from './NavItem';
 import { styles } from './styles';
+import { useSelector } from 'react-redux';
 
 // const navItems = [
 //   { number: 1, text: "Can We Really Stop", isActive: true },
@@ -14,22 +15,21 @@ import { styles } from './styles';
 //   { number: 8, text: "Hope for the Future.." },
 // ];
 
-const Sidebar = () => {
-  const [presentationData, setPresentationData] = useState([]);
-
-  useEffect(() => {
-    // Get presentation data from sessionStorage
-    const storedData = sessionStorage.getItem('presentationData');
-    if (storedData) {
-      setPresentationData(JSON.parse(storedData));
-    }
-  }, []);
+const Sidebar = ({ setCurrentSlideIndex }) => {
+  const { currentSession, error, loading, sessions } = useSelector(
+    (state) => state.toolSessions
+  );
 
   return (
     <nav style={styles.sidebar.container}>
       <div style={styles.sidebar.navItems}>
-        {presentationData.map((slide, index) => (
-          <NavItem key={index} number={index + 1} text={slide.title} />
+        {sessions?.slides?.map((slide, index) => (
+          <NavItem
+            key={index}
+            number={index + 1}
+            text={slide.title}
+            setCurrentSlideIndex={setCurrentSlideIndex}
+          />
         ))}
       </div>
     </nav>

@@ -1,28 +1,39 @@
 import React from 'react';
 
+import { EditorContent } from '@tiptap/react';
+
 import { styles } from '../styles';
 
-const TitleBodyImageSlide = ({ title, content, imageUrl }) => {
+const TitleBodyImageSlide = ({
+  currentSlide,
+  imageInputVisible,
+  setImageInputVisible,
+  titleEditor,
+  bodyEditor,
+}) => {
   // Default placeholder image if none provided
   const defaultImage = 'https://picsum.photos/800/400';
 
   return (
     <article style={styles.slide.container}>
       <div style={styles.slide.content}>
-        <h2 style={styles.slide.title}>{title}</h2>
+        <h2 style={styles.slide.title}>
+          {titleEditor && <EditorContent editor={titleEditor} />}
+        </h2>
 
         <div style={styles.slide.flexContainer}>
           <div style={styles.slide.textColumn}>
-            <p style={styles.slide.body}>
-              {Array.isArray(content) ? content[0] : content}
-            </p>
+            <div style={styles.slide.body}>
+              {bodyEditor && <EditorContent editor={bodyEditor} />}
+            </div>
           </div>
 
           <div style={styles.slide.imageColumn}>
             <img
-              src={imageUrl || defaultImage}
-              alt={title}
+              src={currentSlide?.imageUrl || defaultImage}
+              alt={currentSlide?.title || 'Slide image'}
               style={styles.slide.contentImage}
+              onClick={() => setImageInputVisible(!imageInputVisible)}
             />
           </div>
         </div>

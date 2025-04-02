@@ -1,13 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
+// import TiptapSlide from './components';
+import MultipleLayouts from './components/MultipleLayouts';
+import SlideEditor from './components/SlideEditor';
 import Sidebar from './Sidebar';
 import Slides from './Slides';
 import { styles } from './styles';
 import TopBar from './TopBar';
 
 const PresentationResponse = () => {
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
   return (
     <>
       <link
@@ -17,8 +22,16 @@ const PresentationResponse = () => {
       <main style={styles.app}>
         <TopBar />
         <div style={styles.content}>
-          <Sidebar />
-          <Slides />
+          <Sidebar
+            currentSlideIndex={currentSlideIndex}
+            setCurrentSlideIndex={setCurrentSlideIndex}
+          />
+          <MultipleLayouts
+            currentSlideIndex={currentSlideIndex}
+            setCurrentSlideIndex={setCurrentSlideIndex}
+          />
+          {/* <SlideEditor /> */}
+          {/* <Slides /> */}
         </div>
       </main>
     </>

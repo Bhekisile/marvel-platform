@@ -1,44 +1,51 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import submitPrompt from '@/tools/libs/services/submitPrompt';
+import {
+  setCurrentSession,
+  setToolSessions,
+} from '@/libs/redux/slices/toolSessionsSlice';
+import MultipleLayouts from '@/pages/PresentationResponse/components/MultipleLayouts';
+import { current } from '@reduxjs/toolkit';
 
 const PresentationOutline = () => {
-  const { response } = useSelector((state) => state.tools);
+  const { error, loading, sessions } = useSelector(
+    (state) => state.toolSessions
+  );
   const { data: userData } = useSelector((state) => state.user);
-  // console.log(response);
-  const [selectedOutline, setSelectedOutline] = useState(null);
   const router = useRouter();
+  const [selectedOutline, setSelectedOutline] = useState(null);
+  const dispatch = useDispatch();
+
+  console.log('sessions data', sessions);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+  if (!sessions) {
+    return <p>No data available</p>;
+  }
 
   const handleGeneratePresentation = async () => {
-    const payload = {
-      tool_data: {
-        tool_id: 'presentation',
-        inputs: [
-          { name: 'content', value: 'world war II' },
-          { name: 'outline', value: selectedOutline },
-        ],
-      },
-      type: 'tool',
-      user: {
-        id: userData?.id,
-        fullName: userData?.fullName,
-        email: userData?.email,
-      },
-    };
     try {
-      const response = await submitPrompt(payload);
-      if (response) {
+      if (sessions) {
         // Store response in sessionStorage
-        sessionStorage.setItem('presentationData', JSON.stringify(response));
+        // console.log('selectedOutline', selectedOutline);
+        sessionStorage.setItem('presentationData', JSON.stringify(sessions));
+
+        // Set the selected outline as the current session
+        dispatch(setCurrentSession(selectedOutline));
 
         // Redirect to the PresentationResponse page without the long URL
         router.push('/PresentationResponse');
       }
-    } catch (error) {
-      console.error('Error generating presentation:', error);
+    } catch (err) {
+      console.error('Error generating presentation:', err);
     }
   };
 
@@ -65,6 +72,7 @@ const PresentationOutline = () => {
           alignItems: 'center',
           gap: 7,
           display: 'flex',
+          height: 'fit-content',
         }}
       >
         <div
@@ -108,7 +116,7 @@ const PresentationOutline = () => {
         <div
           style={{
             alignSelf: 'stretch',
-            height: 128,
+            height: 'fit-content',
             borderRadius: 12,
             flexDirection: 'column',
             justifyContent: 'flex-start',
@@ -132,7 +140,7 @@ const PresentationOutline = () => {
           <div
             style={{
               alignSelf: 'stretch',
-              height: 98,
+              height: 'fit-content',
               paddingLeft: 24,
               paddingRight: 24,
               paddingTop: 12,
@@ -179,106 +187,47 @@ const PresentationOutline = () => {
                 alignItems: 'center',
                 gap: 8,
                 display: 'inline-flex',
+                width: '100%',
               }}
             >
               <div
                 style={{
                   color: 'white',
-                  fontSize: 12,
                   fontFamily: 'Satoshi',
                   fontWeight: '700',
                   wordWrap: 'break-word',
+                  width: '100%',
                 }}
               >
-                Document.pdf
-              </div>
-              <div data-svg-wrapper style={{ position: 'relative' }}>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M3 3L9 9M9 3L3 9"
-                    stroke="#B096FF"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
+                {console.log('sessions', sessions.slides)}
+                {sessions?.slides?.map((slide, index) => (
+                  <div
+                    key={index}
+                    role="button"
+                    tabIndex="0"
+                    style={{
+                      backgroundColor: '#1C1C1C',
+                      cursor: 'pointer',
+                      marginBottom: '8px',
+                      padding: '8px',
+                      borderRadius: '10px',
+                      marginLeft: '12px',
+                      background:
+                        selectedOutline === slide ? '#3C3C3C' : '#1C1C1C',
+                      boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                    }}
+                    onClick={() => setSelectedOutline(slide)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setSelectedOutline(slide);
+                      }
+                    }}
+                  >
+                    {index + 1}. {slide.title}
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        </div>
-        <div
-          style={{
-            paddingTop: 12,
-            paddingBottom: 12,
-            paddingLeft: 12,
-            paddingRight: 24,
-            background: '#121212',
-            borderRadius: 12,
-            overflow: 'hidden',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            display: 'inline-flex',
-          }}
-        >
-          <div
-            style={{
-              width: 708,
-              alignSelf: 'stretch',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: 12,
-              display: 'inline-flex',
-            }}
-          >
-            {response.map((outline, id) => (
-              <div
-                key={id}
-                onClick={() => setSelectedOutline(outline)}
-                style={{
-                  alignSelf: 'stretch',
-                  padding: 8,
-                  background:
-                    selectedOutline === outline ? '#3C3C3C' : '#1C1C1C',
-                  boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-                  borderRadius: 10,
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: 8,
-                  display: 'inline-flex',
-                  cursor: 'pointer',
-                }}
-              >
-                <div
-                  style={{
-                    color: 'white',
-                    fontSize: 16,
-                    fontFamily: 'Satoshi',
-                    fontWeight: '900',
-                    wordWrap: 'break-word',
-                  }}
-                >
-                  {id + 1}.
-                </div>
-                <div
-                  style={{
-                    color: 'white',
-                    fontSize: 16,
-                    fontFamily: 'Satoshi',
-                    fontWeight: '400',
-                    wordWrap: 'break-word',
-                  }}
-                >
-                  {outline}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
         <div
@@ -291,6 +240,7 @@ const PresentationOutline = () => {
           }}
         >
           <button
+            type="button"
             onClick={handleGeneratePresentation}
             disabled={!selectedOutline}
             style={{

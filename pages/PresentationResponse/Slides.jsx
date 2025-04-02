@@ -186,63 +186,12 @@ const Slides = () => {
 
   // Helper to check if we can navigate in a direction
   const canNavigate = (direction) => {
-    if (!window.Reveal) return false;
-    const routes = window.Reveal.availableRoutes();
-    return routes && routes[direction];
-  };
-
-  const renderSlides = () => {
-    if (presentationData.length === 0) {
-      return (
-        <section>
-          <h2>No presentation data found</h2>
-          <p>
-            Make sure you have stored your presentation data in sessionStorage.
-          </p>
-        </section>
-      );
+    if (typeof window !== 'undefined') {
+      if (!window.Reveal) return false;
+      const routes = window.Reveal.availableRoutes();
+      return routes && routes[direction];
     }
-
-    // Group slides by group property if it exists
-    const groupedSlides = {};
-    presentationData.forEach((slide) => {
-      // If a slide has no group, it becomes its own standalone horizontal slide
-      const group =
-        slide.group ||
-        `standalone_${Math.random().toString(36).substring(2, 11)}`;
-      if (!groupedSlides[group]) {
-        groupedSlides[group] = [];
-      }
-      groupedSlides[group].push(slide);
-    });
-
-    // Render slides according to groups
-    return Object.keys(groupedSlides).map((group, groupIndex) => {
-      const slides = groupedSlides[group];
-
-      // If this is a standalone slide (no group property in the original slide)
-      if (group.startsWith('standalone_') && slides.length === 1) {
-        return (
-          <section key={groupIndex} data-transition="slide">
-            {renderSlide(slides[0], groupIndex)}
-          </section>
-        );
-      }
-
-      // If this is a group of vertical slides
-      return (
-        <section key={groupIndex} data-transition="slide">
-          {slides.map((slide, slideIndex) => (
-            <section
-              key={`${groupIndex}-${slideIndex}`}
-              data-transition="slide"
-            >
-              {renderSlide(slide, `${groupIndex}-${slideIndex}`)}
-            </section>
-          ))}
-        </section>
-      );
-    });
+    return null;
   };
 
   const renderSlide = (slide, index) => {
@@ -323,6 +272,139 @@ const Slides = () => {
         );
     }
   };
+
+  const renderSlides = () => {
+    if (presentationData.length === 0) {
+      return (
+        <section>
+          <h2>No presentation data found</h2>
+          <p>
+            Make sure you have stored your presentation data in sessionStorage.
+          </p>
+        </section>
+      );
+    }
+
+    // Group slides by group property if it exists
+    const groupedSlides = {};
+    presentationData.forEach((slide) => {
+      // If a slide has no group, it becomes its own standalone horizontal slide
+      const group =
+        slide.group ||
+        `standalone_${Math.random().toString(36).substring(2, 11)}`;
+      if (!groupedSlides[group]) {
+        groupedSlides[group] = [];
+      }
+      groupedSlides[group].push(slide);
+    });
+
+    // Render slides according to groups
+    return Object.keys(groupedSlides).map((group, groupIndex) => {
+      const slides = groupedSlides[group];
+
+      // If this is a standalone slide (no group property in the original slide)
+      if (group.startsWith('standalone_') && slides.length === 1) {
+        return (
+          <section key={groupIndex} data-transition="slide">
+            {renderSlide(slides[0], groupIndex)}
+          </section>
+        );
+      }
+
+      // If this is a group of vertical slides
+      return (
+        <section key={groupIndex} data-transition="slide">
+          {slides.map((slide, slideIndex) => (
+            <section
+              key={`${groupIndex}-${slideIndex}`}
+              data-transition="slide"
+            >
+              {renderSlide(slide, `${groupIndex}-${slideIndex}`)}
+            </section>
+          ))}
+        </section>
+      );
+    });
+  };
+
+  // const renderSlide = (slide, index) => {
+  //   const {
+  //     template,
+  //     title,
+  //     content,
+  //     subtitle,
+  //     imageUrl,
+  //     caption,
+  //     leftContent,
+  //     rightContent,
+  //   } = slide;
+
+  //   switch (template) {
+  //     // Original templates
+  //     case 'titleBody':
+  //       return <TitleBodySlide key={index} title={title} content={content} />;
+  //     case 'titleBullets':
+  //       return (
+  //         <TitleBulletsSlide key={index} title={title} content={content} />
+  //       );
+
+  //     // Image-based templates
+  //     case 'titleImage':
+  //       return (
+  //         <TitleImageSlide
+  //           key={index}
+  //           title={title}
+  //           subtitle={subtitle}
+  //           imageUrl={imageUrl}
+  //         />
+  //       );
+  //     case 'titleBodyImage':
+  //       return (
+  //         <TitleBodyImageSlide
+  //           key={index}
+  //           title={title}
+  //           content={content}
+  //           imageUrl={imageUrl}
+  //         />
+  //       );
+  //     case 'titleBulletsImage':
+  //       return (
+  //         <TitleBulletsImageSlide
+  //           key={index}
+  //           title={title}
+  //           content={content}
+  //           imageUrl={imageUrl}
+  //         />
+  //       );
+  //     case 'twoColumnImage':
+  //       return (
+  //         <TwoColumnImageSlide
+  //           key={index}
+  //           title={title}
+  //           leftContent={leftContent}
+  //           rightContent={rightContent}
+  //           imageUrl={imageUrl}
+  //         />
+  //       );
+  //     case 'stretchImage':
+  //       return (
+  //         <StretchImageSlide
+  //           key={index}
+  //           title={title}
+  //           caption={caption}
+  //           imageUrl={imageUrl}
+  //         />
+  //       );
+
+  //     default:
+  //       return (
+  //         <div>
+  //           <h3>Unknown template: {template}</h3>
+  //           <p>{JSON.stringify(slide)}</p>
+  //         </div>
+  //       );
+  //   }
+  // };
 
   // Navigation methods
   const goToNext = () => {

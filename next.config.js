@@ -11,7 +11,7 @@ const nextConfig = {
   trailingSlash: true,
   eslint: {
     ignoreDuringBuilds: true,
-  }
+  },
 };
 
 module.exports = withTM({

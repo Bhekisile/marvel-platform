@@ -142,10 +142,13 @@ export const styles = {
       backgroundColor: '#1C1C1C',
     },
     active: {
-      backgroundColor: '#1C1C1C',
+      backgroundColor: '#3C3C3C',
     },
     number: {
       fontWeight: '900',
+    },
+    inactive: {
+      backgroundColor: '#1C1C1C',
     },
     text: {
       fontWeight: '400',
@@ -233,6 +236,7 @@ export const styles = {
       listStyle: 'none',
       padding: '0',
       margin: '0',
+      color: '#0F0535',
     },
     bulletItem: {
       color: '#0F0535',
@@ -308,6 +312,7 @@ export const styles = {
     textColumn: {
       flex: '1',
       minWidth: '0',
+      color: '#0F0535',
     },
     imageColumn: {
       flex: '1',
